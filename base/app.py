@@ -92,7 +92,11 @@ def with_session(view_func):
         try:
             wx_obj = WXSession.from_dict(json_data)
             session = wx_obj.create_session()
-            is_valid = get_wx_cookie.check_login_type(session)
+            #如果是调用接口地址前缀包含/login就不检查登录状态
+            if request.endpoint and request.endpoint.startswith("login"):
+                is_valid = True
+            else:
+                is_valid = get_wx_cookie.check_login_type(session)
             if not is_valid:
                 #清除无效的会话
                 redis_conn.delete(setting.constants["session_prefix"] + key_str)
