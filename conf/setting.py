@@ -11,6 +11,7 @@ headers = {
 }
 constants = {
     "session_prefix" : 'wx_session:',
+	"version" : version,
 }
 cookies = {
 		"ptcz": "8565ca6fc09f207978e510b8cbf9abfc5fb51dde89d20c92239d29f086d9c9b5",
