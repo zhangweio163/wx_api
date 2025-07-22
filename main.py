@@ -20,4 +20,4 @@ print_routes()
 
 # ===== 启动应用 =====
 if __name__ == "__main__":
-    app.run(debug=setting.debug, port=8000)
+    app.run(host="0.0.0.0",debug=setting.debug, port=8000)
