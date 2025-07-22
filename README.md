@@ -73,3 +73,7 @@ python main.py
 - ./conf/setting.py 中的 debug 变量设置为 True 可以开启调试模式，方便开发和测试。
 - 当web页面登录企业微信后可以给 ./conf/setting.py中的cookies 变量赋值，此时调用接口时
   会自动带上cookies，避免每次都需要扫码登录。
+
+## 🪪 License
+
+本项目基于 MIT License 开源发布，使用本项目代码需保留原始作者信息（张巍_057910），详情请见 [LICENSE](./LICENSE) 文件。
