@@ -18,7 +18,7 @@ def check_login_type(key_str, session):
     """
     response = get_wx_cookie.check_login_type(session)
     if response:
-        return jsonify(ResetResponse.ok(response).to_dict())
+        return jsonify(ResetResponse.ok("检查登录类型成功",response).to_dict())
     else:
         return jsonify(ResetResponse.fail("检查登录类型失败").to_dict()), 500
 
