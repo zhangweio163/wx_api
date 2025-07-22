@@ -58,4 +58,18 @@
 - 使用 `pipreqs` 自动生成依赖项
 - 执行下面命令安装依赖：
 ```bash
+
 pip install -r requirements.txt
+
+```
+## 启动项目
+```bash
+
+python main.py
+
+```
+
+## debug
+- ./conf/setting.py 中的 debug 变量设置为 True 可以开启调试模式，方便开发和测试。
+- 当web页面登录企业微信后可以给 ./conf/setting.py中的cookies 变量赋值，此时调用接口时
+  会自动带上cookies，避免每次都需要扫码登录。

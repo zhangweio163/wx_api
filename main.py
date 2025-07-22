@@ -2,7 +2,7 @@ from base.app import app
 from controller.app_controller import app_bp
 from controller.login_controller import login_bp
 from controller.org_controller import org_bp
-
+import conf.setting as setting
 # ===== 显式导入 controller 中的所有模块，触发路由注册 =====
 app.register_blueprint(app_bp)
 app.register_blueprint(login_bp)
@@ -20,4 +20,4 @@ print_routes()
 
 # ===== 启动应用 =====
 if __name__ == "__main__":
-    app.run(debug=False, port=8000)
+    app.run(debug=setting.debug, port=8000)

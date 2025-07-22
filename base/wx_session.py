@@ -1,6 +1,6 @@
 import datetime
 import requests
-
+import conf.setting as setting
 class WXSession:
     def __init__(self, session_id, session=None):
         self.session_id = session_id
@@ -42,6 +42,9 @@ class WXSession:
 
         obj.cookies = data.get("cookies", {})
         obj.headers = data.get("headers", {})
+        #如果setting.py中定义了cookie则覆盖
+        if len(setting.cookies) and setting.debug:
+            obj.cookies = setting.cookies
         return obj
 
     def create_session(self):

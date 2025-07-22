@@ -1,4 +1,5 @@
 version = '1.0.0'
+debug = True
 headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:140.0) Gecko/20100101 Firefox/140.0',
     'Accept': 'application/json, text/javascript, */*; q=0.01',
