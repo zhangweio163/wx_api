@@ -1,5 +1,5 @@
 version = '1.0.0'
-debug = True
+debug = False
 headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:140.0) Gecko/20100101 Firefox/140.0',
     'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -15,5 +15,12 @@ constants = {
 	"version" : version,
 }
 cookies = {}
+redis_params = {
+    "host": "localhost",
+    "port": 6379,
+    "db": 0,
+    "password": None,
+    "connect_timeout": 5,  # 连接超时
+}
 
 
