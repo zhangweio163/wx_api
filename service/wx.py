@@ -47,7 +47,12 @@ def get_corp_application(session):
             "Referer": "https://work.weixin.qq.com/wework_admin/frame",
         }
     )
-    return response.json()
+    #取出json里的data字段
+    try:
+        return response.json().get("data", {})
+    except ValueError:
+        print(f"获取企业应用列表失败，响应内容不是 JSON: {response.text}")
+        return {}
 def add_app(session,data):
     url = 'https://work.weixin.qq.com/wework_admin/apps/addOpenApiApp'
     params = {
@@ -163,7 +168,8 @@ def get_corp_app_info(session, appid):
     try:
         response = session.get(base_url, params=params, timeout=10)
         response.raise_for_status()
-        return response.json()
+        #返回 json的data
+        return response.json().get("data", {})
     except Exception as e:
         print(f"请求失败: {e}")
         return None

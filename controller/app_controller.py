@@ -13,7 +13,7 @@ app_bp = Blueprint("app", __name__, url_prefix="/app")  # 统一前缀 /app
 def get_corp_application(key_str,session):
     response = wx.get_corp_application(session)
     if response:
-        return jsonify(ResetResponse.ok(response).to_dict())
+        return jsonify(ResetResponse.ok(data=response).to_dict())
     else:
         return jsonify(ResetResponse.fail("获取企业应用失败").to_dict()), 500
 
@@ -22,7 +22,7 @@ def get_corp_application(key_str,session):
 def add_app(key_str, session, data):
     response = wx.add_app(session, data)
     if response:
-        return jsonify(ResetResponse.ok(response).to_dict())
+        return jsonify(ResetResponse.ok(data=response).to_dict())
     else:
         return jsonify(ResetResponse.fail("添加应用失败").to_dict()), 500
 
@@ -65,7 +65,7 @@ def upload_logo_image(key_str, session, data):
         response = wx.upload_logo_image(session, image_base64, fields)
 
         if response:
-            return jsonify(ResetResponse.ok(response).to_dict())
+            return jsonify(ResetResponse.ok(data=response).to_dict())
         else:
             return jsonify(ResetResponse.fail("上传logo图片失败").to_dict()), 500
 
@@ -85,7 +85,7 @@ def get_app_by_app_id(key_str, session):
     appid = request.args.get("appid")
     response = wx.get_corp_app_info(session, appid)
     if response:
-        return jsonify(ResetResponse.ok(response).to_dict())
+        return jsonify(ResetResponse.ok(data=response).to_dict())
     else:
         return jsonify(ResetResponse.fail("获取应用信息失败").to_dict()), 500
 
@@ -105,7 +105,7 @@ def update_corp_app_setting(key_str, session, data):
 
     response = wx.update_corp_app_setting(session, **data)
     if response:
-        return jsonify(ResetResponse.ok(response).to_dict())
+        return jsonify(ResetResponse.ok(data=response).to_dict())
     else:
         return jsonify(ResetResponse.fail("更新应用设置失败").to_dict()), 500
 
@@ -126,7 +126,7 @@ def update_corp_app_info_setting(key_str, session, data):
         return jsonify(ResetResponse.fail("Missing app_id").to_dict()), 400
     response = wx.update_app_info_by_app_id(session, data)
     if response:
-        return jsonify(ResetResponse.ok("修改成功",response).to_dict())
+        return jsonify(ResetResponse.ok(data=response).to_dict())
     else:
         return jsonify(ResetResponse.fail("获取应用设置失败").to_dict()), 500
 
@@ -145,6 +145,6 @@ def del_app_by_app_id(key_str, session,data):
         return jsonify(ResetResponse.fail("Missing app_id").to_dict()), 400
     response = wx.delete_app_by_app_id(session, request.form.to_dict())
     if response:
-        return jsonify(ResetResponse.ok("删除成功", response).to_dict())
+        return jsonify(ResetResponse.ok(data=response).to_dict())
     else:
         return jsonify(ResetResponse.fail("删除应用失败").to_dict()), 500
