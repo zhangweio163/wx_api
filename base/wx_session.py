@@ -1,12 +1,16 @@
 import datetime
 import requests
 import conf.setting as setting
+class LoginStatus:
+    SCANNING_QR = "scanning_qr"
+    LOGGED_IN = "logged_in"
 class WXSession:
-    def __init__(self, session_id, session=None):
+    def __init__(self, session_id, session=None,login_status=LoginStatus.SCANNING_QR):
         self.session_id = session_id
         self.is_login = False
         self.login_time = None
         self.last_check_time = None  # 新增：上次检查时间
+        self.login_status =  login_status #登录状态，未登录，扫码中，已登录等
 
         # 如果传入了 requests.Session，则取出 cookies 和 headers
         if session:

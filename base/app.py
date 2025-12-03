@@ -7,7 +7,7 @@ from base.redis_connector import redis_conn
 from conf import setting
 from service import get_wx_cookie
 from service.response_obj import ResetResponse
-from base.wx_session import WXSession
+from base.wx_session import WXSession, LoginStatus
 
 app = Flask(__name__)
 
@@ -22,8 +22,8 @@ scheduler.init_app(app)
 
 MAX_SESSION_LIFETIME = 2 * 3600       # 最大存活时间 2 小时
 SESSION_CHECK_INTERVAL = 3600         # 登录时间超过 1 小时才检查
-SESSION_CHECK_RATE_LIMIT = 15 * 60    # 每个会话至少间隔15分钟检查一次
-
+SESSION_CHECK_RATE_LIMIT = 2 * 60    # 每个会话至少间隔2分钟检查一次
+MAX_SCANNER_LIFETIME = 10 * 60               # 扫码中状态最大存活时间 10 分钟
 @scheduler.task('interval', id='job1', seconds=10)
 def job1():
     keys = redis_conn.keys(setting.constants["session_prefix"] + "*")
@@ -37,41 +37,39 @@ def job1():
         if not session_data:
             continue
 
-        #转换成 WXSession 对象
+        # 转成 WXSession 对象
         session = WXSession.from_dict(session_data)
 
         login_time = session.login_time
         last_check = session.last_check_time or datetime.datetime.min
-
-        # 先判断是否有登录时间，没有直接删
+        #如果是扫码中的状态就跳过并且 时间已经 超过了
+        if session.login_status == LoginStatus.SCANNING_QR and not  (now - login_time).total_seconds() > MAX_SCANNER_LIFETIME:
+            continue
+        # 无登录时间，直接清理
         if not login_time:
             print(f"会话 {session.session_id} 无登录时间，删除")
             redis_conn.delete(key)
             continue
 
-        lived = (now - login_time).total_seconds()
         time_since_last_check = (now - last_check).total_seconds()
 
-        # 超过最大存活时间，直接删除
-        if lived > MAX_SESSION_LIFETIME:
-            print(f"会话 {session.session_id} 超过最大存活时间，删除")
+        # 限频：每个会话至少间隔 SESSION_CHECK_RATE_LIMIT 秒才检查一次
+        if time_since_last_check <= SESSION_CHECK_RATE_LIMIT:
+            continue
+
+        # 执行心跳检查
+        is_valid = get_wx_cookie.check_login_type(session.create_session())
+        session.last_check_time = now
+
+        if not is_valid:
+            print(f"会话 {session.session_id} 已失效，删除")
             redis_conn.delete(key)
             continue
 
-        # 只有登录超过1小时，且距离上次检查超过限频时间，才去检查有效性
-        if lived > SESSION_CHECK_INTERVAL and time_since_last_check > SESSION_CHECK_RATE_LIMIT:
-            is_valid = get_wx_cookie.check_login_type(session.create_session())
-            session.last_check_time = now
-
-            if not is_valid:
-                print(f"会话 {session.session_id} 已失效，删除")
-                redis_conn.delete(key)
-            else:
-                print(f"会话 {session.session_id} 检查通过，仍然有效")
-                # 注意不更新 login_time，避免保活
-
-                # 更新 Redis 中 session 的 last_check_time
-                redis_conn.set(key, json.dumps(session.to_dict()))
+        # 保持活性：检查通过则刷新 login_time（模拟活跃）
+        session.login_time = now
+        redis_conn.set(key, json.dumps(session.to_dict()))
+        print(f"会话 {session.session_id} 心跳成功，已保活")
 
 
 
@@ -125,4 +123,4 @@ def with_session(view_func):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    return f"企业微信后台管理API,当前版本: {setting.constants['version']}。"
+    return f"企业微信代理API,当前版本: {setting.constants['version']}。"

@@ -1,5 +1,5 @@
 # ======= 登录路由 =======
-from flask import jsonify, Blueprint
+from flask import jsonify, Blueprint, request
 
 from base.app import with_session
 from base.check_session import check_session
@@ -69,3 +69,45 @@ def get_wx_cookie_route(key_str, session):
         return jsonify(ResetResponse.ok("调用企业微信登录接口成功", cookies).to_dict())
     else:
         return jsonify(ResetResponse.fail("获取企业微信cookie失败").to_dict()), 500
+
+@login_bp.route("/confirm_captcha", methods=["POST"])
+@with_session
+def confirm_captcha(key_str, session, data):
+    captcha_code = data.get("captcha_code")
+    tl_key = data.get("tl_key")
+    if not captcha_code or not tl_key:
+        return jsonify(ResetResponse.fail("参数不完整").to_dict()), 400
+    response = get_wx_cookie.confirm_captcha(session, captcha_code, tl_key)
+    if response:
+        return jsonify(ResetResponse.ok("验证验证码成功", response).to_dict())
+    else:
+        return jsonify(ResetResponse.fail("验证验证码失败").to_dict()), 500
+
+@login_bp.route("/login_by_captcha", methods=["POST"])
+@with_session
+def login_by_captcha(key_str, session, data):
+    tl_key = data.get("tl_key")
+    if not tl_key:
+        return jsonify(ResetResponse.fail("参数不完整").to_dict()), 400
+    response = get_wx_cookie.after_captcha_success(session, tl_key)
+    if 'result' in response:
+        result = response['result']
+        if 'errCode' in result:
+            return jsonify(ResetResponse.fail(response).to_dict())
+    if response:
+        return jsonify(ResetResponse.ok("登录成功", response).to_dict())
+    else:
+        return jsonify(ResetResponse.fail("登录失败").to_dict()), 500
+
+
+@login_bp.route("/create_wx_session", methods=["POST"])
+def create_wx_session():
+    data = request.json
+    cookies = data.get("cookies")
+    if not cookies:
+        return jsonify(ResetResponse.fail("参数不完整").to_dict()), 400
+    key_str = get_wx_cookie.make_wx_session_by_cookie(cookies)
+    if key_str:
+        return jsonify(ResetResponse.ok("创建会话成功", {"key_str": key_str}).to_dict())
+    else:
+        return jsonify(ResetResponse.fail("创建会话失败,无效的cookies").to_dict()), 500
