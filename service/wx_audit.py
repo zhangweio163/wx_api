@@ -193,20 +193,21 @@ def fetch_audit_common(
 
 
 def async_all_audit(s : requests.Session):
-    data = get_audit_list(s)
-    db_connector = DataCenterMindMySQLConnector()
-    db_connector.connect()
-    for l in data["data"]["list"]:
-        if l["template_status"] == 0:
-            continue
-        os = fetch_audit_common(
-            s, template_id=l["template_id"], biz_name=l["template_name"],
-            biz_code_020102=setting.AuditTemplateLevel.get_level(l["template_id"]),
-            biz_code_020103="1", fetch_all=True)
-        for o in os:
-            o.insert(db_connector)
-    db_connector.close()
-
-s = requests.Session()
-s.cookies.update(setting.dev_cookies)
-async_all_audit(s)
+    try:
+        data = get_audit_list(s)
+        db_connector = DataCenterMindMySQLConnector()
+        db_connector.connect()
+        for l in data["data"]["list"]:
+            if l["template_status"] == 0:
+                continue
+            os = fetch_audit_common(
+                s, template_id=l["template_id"], biz_name=l["template_name"],
+                biz_code_020102=setting.AuditTemplateLevel.get_level(l["template_id"]),
+                biz_code_020103="1", fetch_all=True)
+            for o in os:
+                o.insert(db_connector)
+        db_connector.close()
+        return f"已成功同步审批数据，共计 {len(data['data']['list'])} 个审批模板。"
+    except Exception as e:
+        print(f"Fetch audit info failed: {e}")
+        return None

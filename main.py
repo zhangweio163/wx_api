@@ -8,11 +8,13 @@ def create_app():
     from controller.app_controller import app_bp
     from controller.login_controller import login_bp
     from controller.org_controller import org_bp
+    from controller.audit_controller import app_bp as audit_bp
 
     # 注册蓝图
     app.register_blueprint(app_bp)
     app.register_blueprint(login_bp)
     app.register_blueprint(org_bp)
+    app.register_blueprint(audit_bp)
 
     return app
 
