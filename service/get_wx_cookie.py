@@ -6,15 +6,13 @@ import time
 import uuid
 from datetime import datetime
 
-from base import wx_session
 import requests
+
+from base import wx_session
 from base.redis_connector import redis_conn
 from base.wx_session import LoginStatus
 from conf import setting
 
-# python
-import re
-import json
 
 def parse_mobile_confirm_page(html: str):
     """
@@ -55,17 +53,6 @@ def get_cookie(key_str,session):
     setting.headers.update({
         "Referer": "https://work.weixin.qq.com/wework_admin/wwqrlogin/mng/login_qrcode?login_type=login_admin&callback=wwqrloginCallback_1752806305697&redirect_uri=https%3A%2F%2Fwork.weixin.qq.com%2Fwework_admin%2Floginpage_wx%3F_r%3D105%26url_hash%3D&crossorigin=1"
     })
-    cookies = {
-        "wwrtx.i18n_lan": "zh",
-        "ww_lang": "cn,zh",
-        "wwrtx.c_gdpr": "0",
-        "wwrtx.ref": "direct",
-        "wwrtx.refid": "39162987162324445",
-        "wwrtx.ltype": "1",
-        "wwrtx.vid": "1688855053723800",
-        "wxpay.corpid": setting.constants["corpid"],
-        "wxpay.vid": "1688855053723800",
-    }
     url = (
         f"https://work.weixin.qq.com/wework_admin/loginpage_wx"
         f"?_r={random.randint(0, 999)}"
@@ -78,7 +65,7 @@ def get_cookie(key_str,session):
         f"&auth_source=SOURCE_FROM_WEWORK"
         f"&confirm_type=0"
     )
-    res = session.get(url=url, headers=setting.headers, cookies=cookies)
+    res = session.get(url=url, headers=setting.headers)
     if res.status_code == 200:
         html = res.text
         info = parse_mobile_confirm_page(html)

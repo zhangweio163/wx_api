@@ -199,9 +199,3 @@ def make_excel_for_persons(excel_data):
     #返回绝对路径
     file_path = os.path.abspath(f"企业微信人员信息表导出_{id}.xlsx")
     return file_path
-
-from conf.setting import dev_cookies,headers
-s = requests.Session()
-s.cookies.update(dev_cookies)
-s.headers.update(headers)
-print(export_excel_person(s))
