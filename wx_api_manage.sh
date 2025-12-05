@@ -39,7 +39,7 @@ After=network.target
 Type=simple
 User=$(whoami)
 WorkingDirectory=$APP_DIR
-ExecStart=$VENV_DIR/bin/python $APP_DIR/app.py
+ExecStart=$VENV_DIR/bin/python $APP_DIR/main.py
 Restart=always
 RestartSec=5
 
