@@ -68,10 +68,13 @@ function uninstall_service() {
     echo "重新加载 systemd..."
     sudo systemctl daemon-reload
 
-    echo "删除应用目录..."
-    rm -rf $APP_DIR
+    echo "卸载完成！（未删除目录与文件）"
+}
 
-    echo "卸载完成！"
+function restart_service() {
+    echo "重启服务..."
+    sudo systemctl restart $SERVICE_NAME
+    echo "服务已重启。"
 }
 
 function view_log() {
@@ -84,12 +87,14 @@ function menu() {
     echo "1) 安装并启动服务"
     echo "2) 卸载服务"
     echo "3) 查看日志"
+    echo "4) 重启服务"
     echo "q) 退出"
     read -p "输入选项: " choice
     case $choice in
         1) install_service ;;
         2) uninstall_service ;;
         3) view_log ;;
+        4) restart_service ;;
         q|Q) exit 0 ;;
         *) echo "无效选项" ;;
     esac
@@ -99,3 +104,4 @@ function menu() {
 while true; do
     menu
 done
+```
